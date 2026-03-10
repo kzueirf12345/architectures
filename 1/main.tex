@@ -1,0 +1,314 @@
+\documentclass[12pt]{extarticle}
+\linespread{1.5}
+
+\title{T-Flip-Flop}
+\author{Владимир Попов Сергеевич, Б01-411, popov.vs@phystech.edu}
+\date{\today}
+
+\usepackage{cmap}
+\usepackage[T2A]{fontenc}
+\usepackage[english, russian]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{mathtools}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{courier}
+\usepackage{indentfirst}
+\usepackage{stmaryrd}
+\usepackage{caption}
+\usepackage{MnSymbol,wasysym}
+\captionsetup[figure]{labelformat=empty}
+
+\usepackage{tikz}
+\usepackage{tzplot}
+\usetikzlibrary{arrows,decorations.pathmorphing,backgrounds,positioning,fit,petri}
+\usetikzlibrary{calc,intersections,through,backgrounds, quotes, angles}
+\usetikzlibrary{arrows,automata,positioning}
+\tikzset{snake it/.style={decorate, decoration=snake}}
+\usepackage{pgfplots,pgf-pie}
+
+\usepackage{geometry} % Меняем поля страницы
+\geometry{left=2cm}% левое поле
+\geometry{right=1.5cm}% правое поле
+\geometry{top=1cm}% верхнее поле
+\geometry{bottom=2cm}% нижнее поле
+
+\newtheorem{definition}{Определение}
+\newtheorem{remark}{Ремарка!}
+\newtheorem{theorem}{Теорема}
+
+\newcommand{\implyarrow}{%
+  \mathrel{\raisebox{1.3ex}{\rotatebox[origin=c]{90}{\mathhexbox37F}}}}
+
+\DeclareMathOperator{\arccot}{arccot}
+
+\usepackage{listings}
+\usepackage{xcolor}
+
+%New colors defined below
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.758,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+%Code listing style named "mystyle"
+\lstdefinestyle{mystyle}{
+  backgroundcolor=\color{backcolour},   commentstyle=\color{codegreen},
+  keywordstyle=\color{magenta},
+  numberstyle=\tiny\color{codegray},
+  stringstyle=\color{codepurple},
+  basicstyle=\ttfamily\footnotesize,
+  breakatwhitespace=false,         
+  breaklines=true,                 
+  captionpos=b,                    
+  keepspaces=true,                 
+  numbers=left,                    
+  numbersep=5pt,                  
+  showspaces=false,                
+  showstringspaces=false,
+  showtabs=false,                  
+  tabsize=2
+}
+
+%"mystyle" code listing set
+\lstset{style=mystyle}
+
+\captionsetup{labelsep=space, hypcap=false, figurewithin=section, tablewithin=section}
+
+
+\begin{document}
+
+\maketitle
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+\section{Назначение схемы}
+
+У T-Flip-Flop есть вход toggle и вход clk. Toggle говорит о том, что схема должна что-то делать, а именно: если toggle=1, то по восходящему фронту clk (posedge) выход будет переключаться на противоположный; если toggle=0, то выход будет сохраняться.
+
+Может использоваться, чтобы уменьшать вдвое тактовую частоту, которая приходит на вход clk.
+
+\section{Построение}
+
+\subsection{SR-Latch}
+
+Давайте пойдём снизу вверх, сначала сделаем SR-защёлку. Минимальный последовательностный элемент, сохраняющий данные. Есть 2 входа - set и reset. 
+
+Если set=1, reset=0, то cхема запоминает единицу и выход тоже будет равен 1 (Рис.\ref{srl1}). 
+
+Если set=0, reset=1, то cхема запоминает ноль и выход тоже будет равен 0 (Рис.\ref{srl2}).
+
+Если set=0, reset=0, то cхема запоминает не меняется и на выходе остаётся её запомненное состояние (Рис.\ref{srl3}) (Рис.\ref{srl4}).
+
+Комбинация входов set=1, reset=1 запрещена, потому что в таком случае поведение схемы недетерминировано.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\linewidth]{srl1.png}
+    \caption{Рис.\ref{srl1}. SR-Latch set}
+    \label{srl1}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\linewidth]{srl2.png}
+    \caption{Рис.\ref{srl2}. SR-Latch reset}
+    \label{srl2}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\linewidth]{srl3.png}
+    \caption{Рис.\ref{srl3}. SR-Latch, сохранившая состояние после reset}
+    \label{srl3}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\linewidth]{srl4.png}
+    \caption{Рис.\ref{srl4}. SR-Latch, сохранившая состояние после set}
+    \label{srl4}
+\end{figure}
+
+\clearpage
+
+\subsection{D-latch}
+
+Чтобы избавиться от запрещённого состояния сделаем D-защёлку, у которой будет вход data и we (write enable). 
+
+Когда we=1 текущеe значение data на входе запоминается и подаётся на выход (Рис.\ref{dl1}).
+
+Когда we=0 на выход транслируется запомненное значение, вне зависимости от входа data~(Рис.\ref{dl2}).
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\linewidth]{dl1.png}
+    \caption{Рис.\ref{dl1}. D-latch, we=1}
+    \label{dl1}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\linewidth]{dl2.png}
+    \caption{Рис.\ref{dl2}. D-latch, we=0 после запоминания data=1}
+    \label{dl2}
+\end{figure}
+
+\clearpage
+
+\subsection{D-Flip-Flop}
+
+В D-latch есть проблема - сигнал data должен быть стабильным на протяжении всего we=1. Было бы хорошо сократить время записи. Поэтому сделаем D-триггер, который будет записывать данные по восходящему фронту сигнала (posedge) входа clk (в принципе, ничего не мешает сделать запись по нисходящему фронту (negedge)).
+
+Для этого последовательно соединим 2 D-защёлки, первая из которых будет управляющей (master), а вторая - зависимой (slave).
+
+На первую защёлку мы будем подавать инвертированный сигнал clk, то есть чтобы сигнал прошёл на выход, нам нужно сначала подать clk=0, чтобы данные запомнились в master, а после, при переключении clk с 0 на 1, данные запомнятся в slave и будут транслироваться на выход.
+
+На следующих рисунках (Рис.\ref{dff1} - Рис.\ref{dff3}) D-Flip-Flop показана запись единицы.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\linewidth]{dff1.png}
+    \caption{Рис.\ref{dff1}. D-Flip-Flop, хотим записать единицу}
+    \label{dff1}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\linewidth]{dff2.png}
+    \caption{Рис.\ref{dff2}. D-Flip-Flop, данные запомнились в master}
+    \label{dff2}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\linewidth]{dff3.png}
+    \caption{Рис.\ref{dff3}. D-Flip-Flop, данные запомнились в slave. На выходе желаемая единица}
+    \label{dff3}
+\end{figure}
+
+\clearpage
+
+\subsection{T-Flip-Flop}
+
+Теперь мы хотим сделать наш T-триггер, чтобы он по восходящему фронту clk инвертировал выходной сигнал. Его можно сделать за меньшее количество транзисторов. но в задании вроде разрешили за основу брать D-Flip-Flop, поэтому вот \smiley{}.
+
+Так как следующее состояние зависит от предыдущего, мы должны провести провод от выхода Q в начало и подавать на запись его инвертированную версию. Но также нам хочется контролировать когда нужно инвертировать, а когда нет, поэтому у нас будет вход toggle, который "активирует" T-триггер, когда равен единице.
+
+Если toggle=1 и Q=1, то мы должны инвертировать выход, значит input (обозначим так данные, поступающие на D-триггер) Должен быть равен !Q=0
+
+Если toggle=1 и Q=0, то по такой же логике input=!Q=1
+
+Если toggle=0 и Q=1, то мы должны сохранить выходной сигнал, значит input=Q=1
+
+Если toggle=0 и Q=0, аналогично прошлому, input=Q=0
+
+Получаем, что на одинаковые значения toggle и Q - input=0, а на разные - input=1. Это ни что иное как исключающее или. Его можно сделать из 4 не-и (Рис.\ref{xor1} - Рис.\ref{xor4}).
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\linewidth]{xor1.png}
+    \caption{Рис.\ref{xor1}. XOR x=0 y=0}
+    \label{xor1}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\linewidth]{xor2.png}
+    \caption{Рис.\ref{xor2}. XOR x=1 y=0}
+    \label{xor2}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\linewidth]{xor3.png}
+    \caption{Рис.\ref{xor3}. XOR x=0 y=1}
+    \label{xor3}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\linewidth]{xor4.png}
+    \caption{Рис.\ref{xor4}. XOR x=1 y=1}
+    \label{xor4}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\linewidth]{tff1.png}
+    \caption{Рис.\ref{tff1}. T-Flip-Flop. На выходе 0, запись включена.}
+    \label{tff1}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\linewidth]{tff2.png}
+    \caption{Рис.\ref{tff2}. T-Flip-Flop. Меняем clk 1->0. Запись единицы произошла в master D-триггера}
+    \label{tff2}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\linewidth]{tff3.png}
+    \caption{Рис.\ref{tff3}. T-Flip-Flop. Меняем clk 0->1. По восходящему фронту происходит смена значения в D-триггере, выход меняется на 1.}
+    \label{tff3}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\linewidth]{tff4.png}
+    \caption{Рис.\ref{tff4}. T-Flip-Flop. Теперь выставим toggle=0, чтобы проверить что выход не меняется.}
+    \label{tff4}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\linewidth]{tff5.png}
+    \caption{Рис.\ref{tff5}. T-Flip-Flop. И вправду не меняется, сколько не меняй clk, потому что toggle $\oplus$ Q = Q}
+    \label{tff5}
+\end{figure}
+
+\clearpage
+
+Стоит отметить, что для начала симуляции нужно задать какое-то изначальное значение в T-триггер, поэтому на картинках видна константная единица. Если провода красные, то есть непонятно, что там, то нужно подсоединить в качестве первого операнда xor не Q, а вот эту единицу, покликать clk, а потом вернуть всё на место.
+
+\subsection{Все схемы}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\linewidth]{sheme.png}
+    \caption{Рис.\ref{sheme}. Все схемы вместе}
+    \label{sheme}
+\end{figure}
+
+\section{Критический путь}
+
+\textbf{Задержка} = 3*NAND + NOT + NAND + NOT + NOR + NOT + NAND + NOT + NOR = 5*NAND + 4*NOT + 2*NOR = 5*2 + 4 + 2*2 = \textbf{18}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\linewidth]{critical_path.png}
+    \caption{Критический путь}
+    \label{critical_path}
+\end{figure}
+
+\newpage
+
+\section{Количество транзисторов}
+
+NOT - 2 транзистора
+
+NAND - 4 транзистора
+
+NOR - 4 транзистора
+
+\textbf{Общее количество транзисторов} = 8 * 4 (NAND) + 4 * 4 (NOR) + 7 * 2 (NOT) = \textbf{62~транзистора}
+
+
+
+\end{document}
