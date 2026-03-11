@@ -1,0 +1,169 @@
+\documentclass[12pt]{extarticle}
+\linespread{1.5}
+
+\title{ALU\_Register}
+\author{Владимир Попов Сергеевич, Б01-411, Вариант 1, popov.vs@phystech.edu}
+\date{\today}
+
+\usepackage{cmap}
+\usepackage[T2A]{fontenc}
+\usepackage[english, russian]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{mathtools}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{courier}
+\usepackage{indentfirst}
+\usepackage{stmaryrd}
+\usepackage{caption}
+\usepackage{MnSymbol,wasysym}
+\captionsetup[figure]{labelformat=empty}
+
+\usepackage{tikz}
+\usepackage{tzplot}
+\usetikzlibrary{arrows,decorations.pathmorphing,backgrounds,positioning,fit,petri}
+\usetikzlibrary{calc,intersections,through,backgrounds, quotes, angles}
+\usetikzlibrary{arrows,automata,positioning}
+\tikzset{snake it/.style={decorate, decoration=snake}}
+\usepackage{pgfplots,pgf-pie}
+
+\usepackage{geometry} % Меняем поля страницы
+\geometry{left=2cm}% левое поле
+\geometry{right=1.5cm}% правое поле
+\geometry{top=1cm}% верхнее поле
+\geometry{bottom=2cm}% нижнее поле
+
+\newtheorem{definition}{Определение}
+\newtheorem{remark}{Ремарка!}
+\newtheorem{theorem}{Теорема}
+
+\newcommand{\implyarrow}{%
+  \mathrel{\raisebox{1.3ex}{\rotatebox[origin=c]{90}{\mathhexbox37F}}}}
+
+\DeclareMathOperator{\arccot}{arccot}
+
+\usepackage{listings}
+\usepackage{xcolor}
+
+%New colors defined below
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.758,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+%Code listing style named "mystyle"
+\lstdefinestyle{mystyle}{
+  backgroundcolor=\color{backcolour},   commentstyle=\color{codegreen},
+  keywordstyle=\color{magenta},
+  numberstyle=\tiny\color{codegray},
+  stringstyle=\color{codepurple},
+  basicstyle=\ttfamily\footnotesize,
+  breakatwhitespace=false,         
+  breaklines=true,                 
+  captionpos=b,                    
+  keepspaces=true,                 
+  numbers=left,                    
+  numbersep=5pt,                  
+  showspaces=false,                
+  showstringspaces=false,
+  showtabs=false,                  
+  tabsize=2
+}
+
+%"mystyle" code listing set
+\lstset{style=mystyle}
+
+\begin{document}
+
+\maketitle
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+\section{Функциональное описание}
+
+Разработанный модуль АЛУ выполняет определённые входным кодом арифметические операции над двумя операндами и подаёт на выход результат. Данный АЛУ тактируется положительным фронтом, то есть меняет состояние внутреннего регистра и выдаёт следующий результат по положительному фронту входного сигнала \texttt{clk\_i}. Также этот АЛУ имеет возможность синхронного сброса, то есть, если при положительном фронте сигнала \texttt{clk\_i} входной сигнал \texttt{rst\_i=1}, тогда значение регистра и, соответственно, выходного сигнала сбрасываются в 0. В таблице \ref{tab:opcodes} представлены какому коду операции соответствует какое действие, производимое АЛУ.
+
+\begin{table}[h!]
+    \centering
+    \caption{Коды операций разработанного АЛУ}
+    \label{tab:opcodes}
+    \begin{tabular}{|c|l|}
+        \hline
+        \textbf{opcode\_i}  & \textbf{Операция над first\_i и second\_i} \\ \hline
+        \texttt{3'b000}     & Побитовое НЕ-И \\ \hline
+        \texttt{3'b001}     & Побитовое Исключающее ИЛИ \\ \hline
+        \texttt{3'b010}     & Сложение (без знака) \\ \hline
+        \texttt{3'b011}     & Арифметический (знаковый) сдвиг \texttt{first\_i} вправо на \texttt{second\_i} \\ \hline
+        \texttt{3'b100}     & Побитовое ИЛИ \\ \hline
+        \texttt{3'b101}     & Логический сдвиг \texttt{first\_i} влево на \texttt{second\_i} \\ \hline
+        \texttt{3'b110}     & Побитовое НЕ для \texttt{first\_i} \\ \hline
+        \texttt{3'b111}     & \texttt{first\_i} $<$ \texttt{second\_i} \\ \hline
+    \end{tabular}
+\end{table}
+
+\section{Структурная схема}
+
+На стрелках, ведущими ко входам мультиплексора указаны индексы, по которым выбирается этот вариант. Все логические вентили представленные на схеме являются побитовыми
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1\linewidth]{diagram.png}
+    \caption{Диаграмма ALU}
+    \label{fig:diagram}
+\end{figure}
+
+\newpage
+
+\section{Параметры}
+
+\begin{table}[h!]
+    \centering
+    \caption{Описание параметров}
+    \label{tab:params}
+    \begin{tabular}{|c|c|l|}
+        \hline
+        \textbf{Название}  & \textbf{Значениe}                  & \textbf{Описание} \\ \hline
+        \texttt{WIDTH}     & Размер слова (по умолчанию 64)     & Количество бит в операндах \\ \hline
+    \end{tabular}
+\end{table}
+
+\newpage
+
+\section{Порты}
+
+\begin{table}[h!]
+    \centering
+    \caption{Описание портов}
+    \label{tab:ports}
+    \begin{tabular}{|c|c|l|}
+        \hline
+        \textbf{Название}  & \textbf{Ширина}  & \textbf{Описание} \\ \hline
+        \texttt{clk\_i}     & 1       & Тактовый сигнал \\ \hline
+        \texttt{rst\_i}     & 1       & Сигнал сброса \\ \hline
+        \texttt{opcode\_i}  & 3       & Код выполняемой операции \\ \hline
+        \texttt{first\_i}   & WIDTH   & Первый операнд \\ \hline
+        \texttt{second\_i}  & WIDTH   & Второй операнд \\ \hline
+        \texttt{result\_o}  & WIDTH   & Результат операции \\ \hline
+    \end{tabular}
+\end{table}
+
+\section{Тактирование и сброс}
+
+Тактирование осуществляется через входной порт clk\_i. Запись в D-триггер производится по положительному фронту. 
+
+Сброс осуществляется через входной порт rst\_i. Сброс синхронный с тактовым сигналом, то есть по положительному фронту clk\_i в D-триггер записывается вычисленное значение, если rst\_i=0, и записывается 0, если rst\_i=1. Сброс в 0 происходит при положительном фронте тактового сигнала и rst\_i выставленным в 1.
+
+\section{Тестирование}
+
+В always-блоке описывается изменение тактового сигнала с 0 на 1 каждую единицу времени. Далее будем называть циклом - время между 2 ближайшими положительными фронтами тактового сигнала.
+
+В начале обнулим rst\_i, после синхронизируемся с тактовым сигналом, выставим rst\_i в единицу, чтобы сбросить модуль в начальное состояние, опять синхронизируемся с тактовым сигналом, вернём rst\_i в ноль. 
+
+Далее будем по положительному фронту тактового сигнала выставлять поочерёдно все возможные коды операций в opcode\_i, а также рандомить первый и второй операнд. Рандомить мы будем с конкретным сидом, чтобы можно было воспроизвести тестовый набор. Так, чтобы написать тесты, можно для каждого сида руками посчитать корректные значения и сравнивать с ними.
+
+\end{document}
