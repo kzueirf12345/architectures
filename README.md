@@ -18,3 +18,12 @@
 | ```make clean```      | Очищает *.out и *.vcd          | 
 | ```make start```      | Запускает gtkwave передвая ему dump.vcd        | 
 | ```make all```        | build + start                          | 
+
+## 3
+
+Исследование предсказателя ветвлений RISC-V на основе BHT. Для запуска симулятора необходима java.
+
+```bash
+$ cd 3
+$ java -jar rars1_6.jar
+```
