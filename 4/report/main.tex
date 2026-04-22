@@ -1,0 +1,235 @@
+\documentclass[12pt]{extarticle}
+\linespread{1.5}
+
+\title{Четвёртое ДЗ по архитектурам.}
+\author{Попов Владимир Сергеевич. Б01-411. popov.vs@phystech.edu}
+\date{\today}
+
+\usepackage{cmap}
+\usepackage[T2A]{fontenc}
+\usepackage[english, russian]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{mathtools}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{courier}
+\usepackage{indentfirst}
+\usepackage{stmaryrd}
+\usepackage{caption}
+\captionsetup[figure]{labelformat=empty}
+\usepackage{amssymb}
+\usepackage{multirow, makecell, array}
+\usepackage{ wasysym }
+
+\usepackage{tikz}
+\usepackage{tzplot}
+\usetikzlibrary{arrows,decorations.pathmorphing,backgrounds,positioning,fit,petri}
+\usetikzlibrary{calc,intersections,through,backgrounds, quotes, angles}
+\usetikzlibrary{arrows,automata,positioning}
+\tikzset{snake it/.style={decorate, decoration=snake}}
+\usepackage{pgfplots,pgf-pie}
+
+\usepackage{geometry} % Меняем поля страницы
+\geometry{left=2cm}% левое поле
+\geometry{right=1.5cm}% правое поле
+\geometry{top=1cm}% верхнее поле
+\geometry{bottom=2cm}% нижнее поле
+
+\newtheorem{definition}{Определение}
+\newtheorem{remark}{Ремарка!}
+\newtheorem{theorem}{Теорема}
+
+\newcommand{\implyarrow}{%
+  \mathrel{\raisebox{1.3ex}{\rotatebox[origin=c]{90}{\mathhexbox37F}}}}
+
+\DeclareMathOperator{\arccot}{arccot}
+
+\usepackage{listings}
+\usepackage{xcolor}
+
+%New colors defined below
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+%Code listing style named "mystyle"
+\lstdefinestyle{mystyle}{
+  backgroundcolor=\color{backcolour},   commentstyle=\color{codegreen},
+  keywordstyle=\color{magenta},
+  numberstyle=\tiny\color{codegray},
+  stringstyle=\color{codepurple},
+  basicstyle=\ttfamily\footnotesize,
+  breakatwhitespace=false,         
+  breaklines=true,                 
+  captionpos=b,                    
+  keepspaces=true,                 
+  numbers=left,                    
+  numbersep=5pt,                  
+  showspaces=false,                
+  showstringspaces=false,
+  showtabs=false,                  
+  tabsize=2
+}
+
+%"mystyle" code listing set
+\lstset{style=mystyle}
+
+\begin{document}
+
+
+\maketitle
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+\section{Теоретическая справка}
+
+\subsection{LRU}
+
+LRU (Least Recently Used) - Это политика замещения. В нашем контексте политика замещения кэш-линий. При достижении максимальной ёмкости кэша вытесняется кэш-линия с наиболее давним времнем запроса. У каждой кэш-линии есть время последнего запроса к ней. Политика опирается на то, что данные, которые недавно использовлись, будут переиспользованы. 
+
+Плохо себя показывает при единоразовом сканировании, при пробуксовке (работа с массивом данных, размер которых превышает размер кэша). Также если строка приходит, то она обязательно попадает в кэш, а ведь пришедшая строка может быть не горячей, но она пролежит в кэше достаточно долго, занимая место у более горячих строк.
+
+\subsection{RRIP}
+
+RRIP (Re-Reference Interval Prediction) - полтики замещения кэш-линий. К каждой кэш-линии добавляется допустим 2 бита RRPV (Re-Reference Prediction Value), которые показывают через какой интервал времени данные понадобятся снова. 
+
+\subsubsection{Miss}
+
+RRPV = 2, чтобы дать шанс новой кэш-линии стать горячей и не вытесниться в самом начале.
+
+\subsubsection{Hit}
+
+RRPV = 0.
+
+\subsubsection{Eviction}
+
+Выкидывается любая строка с RRPV == 3. Если такой строки нет, то у всех строк RRPV инкрементируется.
+
+\subsection{SHIP}
+
+SHiP (Signature-based Hit Predictor) - Это тоже политика замещения кэш-линий. Она основана на RRIP, но добавляет такое понятие как сигнатура инструкции. В качестве сигнатуры рассмотрим PC инструкции. Идея в том, чтобы понимать, эта инструкция "плохая" и не переиспользует данные, или же "хорошая" и данные от неё хотелось бы положить в кэш. Ввёдем таблицу SHCT (Signature History Counter Table), в которой для каждой сигнатуры будет храниться насыщающийся счётчик (двух и трёх битный), показывающий "хорошесть" инструкции. Также к каждой кэш-линии, которую будем записывать, добавим Outcome Bit, показывающий была ли использована эта строка, пока лежала в кэше.
+
+
+\subsubsection{Miss}
+
+Берётся PC инструкции, которая вызвала промах. По нему из таблицы SHCT получаем значение счётчика. Если счётчик равен 0 - ставим RRPV максимальным, чтобы если что сразу вытеснить строку, а если нет - ставим стандартный RRPV со средним приоритетом.
+
+\subsubsection{Hit}
+
+Если Outcome Bit был равен 0, то выставляется в 1. 
+
+++RRPV.
+
+\subsubsection{Eviction}
+
+Сначала происходит тоже самое, что и при RRIP, а после выбора строчки для вытеснения, проверяется Outcoming Bit, и если он равен нулю, то по сигнатуре декрементируется (с учётом насыщения) счётчик в таблице SHCT.
+
+\subsection{SPP}
+
+SPP (Signature Path Prefetcher) - это алгоритм префетчинга, который старается распознать паттерны обращения в память, чтобы заранее подгружать в кэш строки, к которым скорее всего в будущем будет обращение. 
+
+Вводится 2 таблицы:
+
+\begin{enumerate}
+    \item ST (Signature Table) - таблица, в которой каждой странице памяти соответствует сигнатура (это не та же сигнатура, что в SHiP), которая хранит историю обращений к этой странице. При новом обращении в сигнатуру побитовым или записывается текущая дельта - разница между текущим и прошлым адресами.
+    \item PT (Pattern Table) - таблица, где каждой сигнатуре, полученной из ST, соответствует дельта, которая чаще всего встречалась до этого, а также насыщающийся счётчик "доверия". Если пришедшая дельта совпала со старой, то счётчик инкрементируется, если не совпала - декрементируется. Если в результате счётчик стал равен нулю старая дельта заменяется на новую, а счётчик ставится в дефолтное значение. Если счётчик стал больше какого-то порогового значения, то иницируется префетч, а также вычисляется сигнатура, которая может быть, если обращение к данным продолжат идти по такому же паттерну (то есть добавляет предсказанную дельту), и проверяет счётчик для новой сигнатуры. Таким образом при удачном предсказании наперёд можно запрефетчить много обращений.
+\end{enumerate}
+
+\section{Описание исследования}
+
+На симуляторе кэшей мы прогоним трассы с записанными обращениям какой-то высоконагруженной программы в память. Исследуем 3 различных трассы и 15 конфигураций кэшей (конкретно будем менять параметры L2-кэша).
+
+Для анализа выбраны следующие трассы:
+
+\begin{enumerate}
+    \item 445.gobmk-2B.champsimtrace
+    \item 603.bwaves\_s-1080B.champsimtrace
+    \item 625.x264\_s-12B.champsimtrace
+\end{enumerate}
+
+И следующие конфигурации:
+
+\begin{enumerate}
+    \item champsim\_lru\_no\_256s\_8w    
+    \item champsim\_lru\_no\_512s\_8w    
+    \item champsim\_lru\_no\_512s\_16w   
+    \item champsim\_lru\_no\_1024s\_8w   
+    \item champsim\_lru\_no\_1024s\_16w  
+    \item champsim\_ship\_no\_256s\_8w    
+    \item champsim\_ship\_no\_512s\_8w    
+    \item champsim\_ship\_no\_512s\_16w   
+    \item champsim\_ship\_no\_1024s\_8w   
+    \item champsim\_ship\_no\_1024s\_16w  
+    \item champsim\_ship\_spp\_256s\_8w
+    \item champsim\_ship\_spp\_512s\_8w
+    \item champsim\_ship\_spp\_512s\_16w
+    \item champsim\_ship\_spp\_1024s\_8w
+    \item champsim\_ship\_spp\_1024s\_16w
+\end{enumerate}
+
+\section{Результаты}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.9\linewidth]{results.png}
+    \caption{Зависимость Hit Rate для разных политик замещения и префетчинга от размера кэша}
+    \label{fig:results}
+\end{figure}
+
+
+\subsection{Насколько улучшила или ухудшила результаты смена политики с LRU на SHIP?}
+
+SHiP показал себя в 1.5-2 раза хуже чем LRU на выбранных данных. Но при этом скорость роста при увеличении размера кэша у LRU меньше, чем у SHiP. Есть предположение, что SHiP не хватило места, чтобы хранить все необходимые горячие линии, тогда как LRU хранит все линии достаточно долго, что не приводило к вытеснениям. Также данный график мы строили как среднее геометрическое по 3 трассам, и 2 из них были сильно короче, чем gobmk. Построим графики для каждой из трасс по отдельности
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.9\linewidth]{bwaves.png}
+    \caption{Зависимость Hit Rate на трассе bwaves}
+    \label{fig:bwaves}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.9\linewidth]{gobmk.png}
+    \caption{Зависимость Hit Rate на трассе gobmk}
+    \label{fig:gobmk}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.9\linewidth]{x264.png}
+    \caption{Зависимость Hit Rate на трассе x264}
+    \label{fig:x264}
+\end{figure}
+
+\clearpage
+
+Теперь можно увидеть, что на bwaves SHiP сильно проигрывает, а на gobmk проигрывает, но чуть чуть. Мне кажется, это может быть связано с тем, что SHiP пытается найти паттерны, но не может распознать такие сложные паттерны, как в этих трассах, и поэтому постоянно сбивается и ему надо заново переобучиваться, тогда как LRU пытается просто хранить ближайшие данные, и поэтому по случайности они переиспользуются чаще. На трассе x624 SHiP показывает себя хорошо. Судя по всему его алгоритм смог адаптироваться к используемым паттернам, поэтому при увеличении размера кэша всё больше и больше полезных данных могут оставаться для переиспользования.
+
+Так же можно посмотреть на последние значение 1024K для x624. Судя по всему этого размера кэша стало хватать, чтобы уместить в себя какой-то блок данных целиком, поэтому появился резкий скачок Hit Rate как LRU, так и SHiP. 
+
+\subsection{Какой прирост Hit Rate дало включение префетчера?}
+
+Не то чтобы дало прирост \smiley. Так как в целом SHiP показывает себя плохо на наших трассах из-за сложных паттернов обращения, то и префетч судя по всему не может их хорошо предсказать. Либо же может хорошо предсказать, но при этом паттерн быстро заканчивается из-за чего остаётся хвост в несколько миссов, который в совокупности играет роль. SPP неплохо показывает себя на маленьких размерах кэша, так как маленькие размеры только и могут что кэшировать маленькие циклы, поэтому на фоне и так огромного количества миссов из-за пробуксовки нам хочется хоть что-нибудь угадать, и тут помогает префетч.
+
+\subsection{Какой размер кэша "достаточный"?}
+
+Точно можно сказать только про bwaves и политику LRU, в этом случае достаточный размер - 128K. В остальных случаях графики всё ещё растут вверх, поэтому сказать точно нельзя. По поводу SHiP на bwaves, мне кажется алгоритм может раскрыться при дальнейшем увеличении кэша, так как Hit Rate просто ужасен, хоть график и похож на плато.
+
+По среднему геометрическому также нельзя сказать достаточный размер кэша, все 3 конфигурации растут вверх при увеличение размера кэша.
+
+\subsection{На каком размере кэша больше проявляются улучшения Hit Rate — на большом или на малом?}
+
+Улучшения больше проявляются на большом объёме. Более умным политикам нужно место, чтобы держать всё, что они считают нужным, тогда как в LRU в этом месте будет просто дольше лежать мусор. Поэтому на графике по среднему геометрическому видно, что скорость роста SHiP больше, чем у LRU.
+
+\subsection{Что выгоднее увеличивать — значение set или way при равном размере кэша?}
+
+Судя по графикам, где есть 2 отметки с одинаковым размером (512K), но с разной пропорцией set/way, выгоднее увеличивать значение way. Небольшой упадок есть только у LRU на gobmk, в остальных случаях замена половины set-ов на половину way-ев выгодна.
+
+\end{document}

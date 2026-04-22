@@ -1,0 +1,46 @@
+=== ОТЧЕТ ДЛЯ ТРАССЫ 445.gobmk-2B.champsimtrace.xz ===
+БИНАРНИК: bin_experiments/champsim_lru_no_256s_8w
+cpu0->cpu0_L2C TOTAL        ACCESS:    1054774 HIT:     508836 MISS:     545938 MSHR_MERGE:          0
+----------------------------------------
+БИНАРНИК: bin_experiments/champsim_lru_no_512s_8w
+cpu0->cpu0_L2C TOTAL        ACCESS:    1054883 HIT:     720643 MISS:     334240 MSHR_MERGE:          0
+----------------------------------------
+БИНАРНИК: bin_experiments/champsim_lru_no_512s_16w
+cpu0->cpu0_L2C TOTAL        ACCESS:    1054945 HIT:     903295 MISS:     151650 MSHR_MERGE:          0
+----------------------------------------
+БИНАРНИК: bin_experiments/champsim_lru_no_1024s_8w
+cpu0->cpu0_L2C TOTAL        ACCESS:    1054947 HIT:     889672 MISS:     165275 MSHR_MERGE:          0
+----------------------------------------
+БИНАРНИК: bin_experiments/champsim_lru_no_1024s_16w
+cpu0->cpu0_L2C TOTAL        ACCESS:    1054955 HIT:     985383 MISS:      69572 MSHR_MERGE:          0
+----------------------------------------
+БИНАРНИК: bin_experiments/champsim_ship_no_256s_8w
+cpu0->cpu0_L2C TOTAL        ACCESS:    1054885 HIT:     533179 MISS:     521706 MSHR_MERGE:          0
+----------------------------------------
+БИНАРНИК: bin_experiments/champsim_ship_no_512s_8w
+cpu0->cpu0_L2C TOTAL        ACCESS:    1054929 HIT:     700484 MISS:     354445 MSHR_MERGE:          0
+----------------------------------------
+БИНАРНИК: bin_experiments/champsim_ship_no_512s_16w
+cpu0->cpu0_L2C TOTAL        ACCESS:    1054945 HIT:     856181 MISS:     198764 MSHR_MERGE:          0
+----------------------------------------
+БИНАРНИК: bin_experiments/champsim_ship_no_1024s_8w
+cpu0->cpu0_L2C TOTAL        ACCESS:    1054947 HIT:     864488 MISS:     190459 MSHR_MERGE:          0
+----------------------------------------
+БИНАРНИК: bin_experiments/champsim_ship_no_1024s_16w
+cpu0->cpu0_L2C TOTAL        ACCESS:    1054954 HIT:     976942 MISS:      78012 MSHR_MERGE:          0
+----------------------------------------
+БИНАРНИК: bin_experiments/champsim_ship_spp_256s_8w
+cpu0->cpu0_L2C TOTAL        ACCESS:    1624648 HIT:     736731 MISS:     887917 MSHR_MERGE:     145167
+----------------------------------------
+БИНАРНИК: bin_experiments/champsim_ship_spp_512s_8w
+cpu0->cpu0_L2C TOTAL        ACCESS:    1609317 HIT:    1003280 MISS:     606037 MSHR_MERGE:     100077
+----------------------------------------
+БИНАРНИК: bin_experiments/champsim_ship_spp_512s_16w
+cpu0->cpu0_L2C TOTAL        ACCESS:    1605431 HIT:    1251483 MISS:     353948 MSHR_MERGE:      52369
+----------------------------------------
+БИНАРНИК: bin_experiments/champsim_ship_spp_1024s_8w
+cpu0->cpu0_L2C TOTAL        ACCESS:    1607680 HIT:    1260673 MISS:     347007 MSHR_MERGE:      53646
+----------------------------------------
+БИНАРНИК: bin_experiments/champsim_ship_spp_1024s_16w
+cpu0->cpu0_L2C TOTAL        ACCESS:    1627510 HIT:    1466358 MISS:     161152 MSHR_MERGE:      15748
+----------------------------------------
